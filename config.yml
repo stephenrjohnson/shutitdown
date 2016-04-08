@@ -1,0 +1,9 @@
+DBUS:
+  SERVICE : 'com.ubuntu.Upstart'
+  OBJECT : '/com/ubuntu/Upstart'
+  IFACE : 'com.ubuntu.Upstart0_6'
+  LOCKSTATE : 'desktop-lock'
+  UNLOCKSTATE : 'desktop-unlock'
+DOCK:
+  VENDOR : 0x17ef
+  PRODUCT : 0x100f

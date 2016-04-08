@@ -3,19 +3,15 @@ require 'time'
 require 'bundler/setup'
 require 'dbus'
 require 'libusb'
+require 'yaml'
+CONFIG = YAML.load(File.read('config.yml'))
 
-VENDOR=0x17ef
-PRODUCT=0x100f
-SERVICE='com.ubuntu.Upstart'
-OBJECT='/com/ubuntu/Upstart'
-IFACE='com.ubuntu.Upstart0_6'
-
-trap("INT") {
-  puts "Quitting..."
+trap('INT') do
+  puts 'Quitting...'
   halter.quit
   main.quit
   exit
-}
+end
 
 armed = false
 halt = false
@@ -25,34 +21,31 @@ def shutitdown
 end
 
 halter = Thread.new do
- while true do 
-   usb1 = LIBUSB::Context.new
-   dockcheck = usb1.devices(:idVendor => VENDOR, :idProduct => PRODUCT).first
-   sleep 1
-   if (armed == true) && (dockcheck.nil? == true)
-     shutitdown
-   end
+  loop do
+    usb1 = LIBUSB::Context.new
+    dockcheck = usb1.devices(idVendor: CONFIG['DOCK']['VENDOR'], idProduct: CONFIG['DOCK']['PRODUCT']).first
+    sleep 1
+    shutitdown if (armed == true) && (dockcheck.nil? == true)
   end
 end
 
-
 bus   = DBus.session_bus
-saver = bus.service(SERVICE).object(OBJECT)
+saver = bus.service(CONFIG['DBUS']['SERVICE']).object(CONFIG['DBUS']['OBJECT'])
 saver.introspect
-saver.default_iface =IFACE
-saver.on_signal("EventEmitted") do |state|
+saver.default_iface = CONFIG['DBUS']['IFACE']
+saver.on_signal('EventEmitted') do |state|
   usb2 = LIBUSB::Context.new
-  dock = usb2.devices(:idVendor => VENDOR, :idProduct => PRODUCT).first
-  if state == 'desktop-lock'
-    if dock.nil?
-      armed = false
-    else 
-      armed = true
-    end
-    puts "[#{ Time.now } ] Screensaver has been #{ state }. Device armed #{armed}"
-  elsif state == 'desktop-unlock'
+  dock = usb2.devices(idVendor: CONFIG['DOCK']['VENDOR'], idProduct: CONFIG['DOCK']['PRODUCT']).first
+  if state == CONFIG['DBUS']['LOCKSTATE']
+    armed = if dock.nil?
+              false
+            else
+              true
+            end
+    puts "[#{Time.now} ] Screensaver has been #{state}. Device armed #{armed}"
+  elsif state == CONFIG['DBUS']['UNLOCKSTATE']
     armed = false
-    puts "[#{ Time.now } ] Screensaver has been #{ state }. Device armed #{armed}"
+    puts "[#{Time.now} ] Screensaver has been #{state}. Device armed #{armed}"
   end
 end
 
