@@ -25,7 +25,6 @@ def shutitdown
 end
 
 halter = Thread.new do
- puts 'Running backgroup checker'
  while true do 
    usb1 = LIBUSB::Context.new
    dockcheck = usb1.devices(:idVendor => VENDOR, :idProduct => PRODUCT).first
@@ -36,7 +35,6 @@ halter = Thread.new do
   end
 end
 
-halter.run
 
 bus   = DBus.session_bus
 saver = bus.service(SERVICE).object(OBJECT)
@@ -58,7 +56,9 @@ saver.on_signal("EventEmitted") do |state|
   end
 end
 
-main = DBus::Main.new
-main << bus
+listen = DBus::Main.new
+listen << bus
+puts 'Running backgroup checker'
+halter.run
 puts 'Running dbus listener'
-main.run
+listen.run
