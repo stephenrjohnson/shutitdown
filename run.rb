@@ -17,7 +17,7 @@ armed = false
 halt = false
 
 def shutitdown
-  puts 'Shut it down bro'
+  system(CONFIG['SHUTDOWN']['COMMAND'])
 end
 
 halter = Thread.new do

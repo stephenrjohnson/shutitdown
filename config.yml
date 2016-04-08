@@ -7,3 +7,5 @@ DBUS:
 DOCK:
   VENDOR : 0x17ef
   PRODUCT : 0x100f
+SHUTDOWN:
+  COMMAND : 'sudo halt'

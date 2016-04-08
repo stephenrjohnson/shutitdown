@@ -1,1 +1,3 @@
-Simple scrip to check we are docked and if the screen saver has been triggered. If that's the case halt the machine if we remove the laptop from the dock without unlocking.
+Simple scrip to check we are docked and if the screen saver has been triggered.
+ If that's the case halt the machine if we remove the laptop from the dock without unlocking.
+ Please note person running the script must had sudo halt perms.
