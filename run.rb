@@ -51,7 +51,7 @@ end
 
 listen = DBus::Main.new
 listen << bus
-puts 'Running backgroup checker'
+puts "#{Time.now} Running backgroup checker"
 halter.run
-puts 'Running dbus listener'
+puts "#{Time.now} Running dbus listener"
 listen.run
