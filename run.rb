@@ -6,12 +6,6 @@ require 'libusb'
 require 'yaml'
 CONFIG = YAML.load(File.read('config.yml'))
 
-trap('INT') do
-  puts 'Quitting...'
-  halter.quit
-  main.quit
-  exit
-end
 
 armed = false
 halt = false
@@ -49,8 +43,18 @@ saver.on_signal('EventEmitted') do |state|
   end
 end
 
+
+
 listen = DBus::Main.new
 listen << bus
+
+trap('INT') do
+  puts "#{Time.now} exitting"
+  halter.exit
+  listen.quit
+  exit
+end
+
 puts "#{Time.now} Running backgroup checker"
 halter.run
 puts "#{Time.now} Running dbus listener"
